@@ -44,6 +44,7 @@ def main():
 
         # draw character
         main_c.draw(window)
+        main_c.update_location(level_array)
 
     while True:
         # get event

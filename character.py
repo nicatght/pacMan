@@ -10,8 +10,19 @@ class pac_man:
         self.direction = "r"
 
         self.position = [15, 9]
+        self.r_position = [(self.position[1] + margin_x) * 20, (self.position[0] + margin_y) * 20]
 
     def draw(self, window):
-        position = ((self.position[1] + margin_x) * 20, (self.position[0] + margin_y) * 20)
-        window.blit(self.character, position)
+        window.blit(self.character, (self.r_position[0], self.r_position[1]))
+
+    def update_location(self, level_array: list):
+        match self.direction:
+            case "r":
+                self.r_position = (self.r_position[0] + 1, self.r_position[1])
+            case "l":
+                self.r_position = (self.r_position[0] - 1, self.r_position[1])
+            case "u":
+                self.r_position = (self.r_position[0], self.r_position[1] - 1)
+            case "d":
+                self.r_position = (self.r_position[0], self.r_position[1] + 1)
 
