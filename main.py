@@ -1,6 +1,8 @@
 margin_x = 10
 margin_y = 4
 
+n_level = 1
+
 
 def calculate_position_with_margin(x, y) -> tuple:
     return x + margin_x, y + margin_y
@@ -8,13 +10,13 @@ def calculate_position_with_margin(x, y) -> tuple:
 
 def main():
     import pygame
-    from load_level import load_to_list
+    import load_level
     from sys import exit
     from character import pac_man
 
     pygame.init()
     screen = pygame.display.set_mode((960, 540))
-    level_array = rows = columns = None
+
     FPS = 60
     clock = pygame.time.Clock()
     pygame.display.set_caption("PacMan")
@@ -29,22 +31,20 @@ def main():
     def redraw(window):
         window.fill((0, 0, 0))
 
-        nonlocal level_array, rows, columns
+        if load_level.level_array is None:
+            load_level.load_level(1)
 
-        if level_array is None:
-            data = load_to_list(1)
-            level_array = data["data"]
-            rows = data["rows"]
-            columns = data["columns"]
+        rows = load_level.rows
+        columns = load_level.columns
 
         for row in range(rows):
             for column in range(columns):
                 p = calculate_position_with_margin(column, row)
-                draw_rec(window, p[0], p[1], level_array[row * columns + column])
+                draw_rec(window, p[0], p[1], load_level.level_array[row * columns + column])
 
         # draw character
         main_c.draw(window)
-        main_c.update_location(level_array)
+        main_c.update_location(load_level.level_array)
 
     while True:
         # get event

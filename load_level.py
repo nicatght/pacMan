@@ -1,21 +1,29 @@
 import json
 
-level_array: list
+level_array = None
+level: int
 rows: int
 columns: int
 
 
-def load_to_list(level: int) -> json:
-    global level_array, rows, columns
-    PATH = "./levels/" + str(level) + ".json"
+def load_level(s_level: int) -> None:
+    global level_array, rows, columns, level
+    level = s_level
+    PATH = "./levels/" + str(s_level) + ".json"
     with open(PATH) as f:
         data = json.load(f)
-    return data
+        level_array = data["data"]
+        rows = data["rows"]
+        columns = data["columns"]
+
+
+def load_data():
+    return level_array
 
 
 # testing purpose
 def main():
-    load_to_list(1)
+    load_level(1)
     print(level_array)
 
 
