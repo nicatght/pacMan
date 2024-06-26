@@ -28,6 +28,7 @@ def main():
         if color_index == 1:
             pygame.draw.rect(window, (0, 100, 255), pygame.Rect(20 * x, 20 * y, 20, 20))
 
+    # loop that update the screen
     def redraw(window):
         window.fill((0, 0, 0))
 
