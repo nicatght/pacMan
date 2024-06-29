@@ -13,9 +13,9 @@ def main():
     import pygame
     import load_level
     from sys import exit
-    from character import pac_man
+    from character import pac_man, ghost
 
-    game_play_status = True
+    game_play_status = False
     pygame.init()
     screen = pygame.display.set_mode((960, 540))
 
@@ -27,6 +27,10 @@ def main():
 
     # load character
     main_c = pac_man()
+    ghost_0 = ghost(0)
+    ghost_1 = ghost(1)
+    ghost_2 = ghost(2)
+    ghost_3 = ghost(3)
 
     # load point picture
     point_pic = pygame.image.load("./pic/point.png")
@@ -52,6 +56,11 @@ def main():
         # draw character
         main_c.draw(window)
         main_c.update_location(load_level.level_array)
+
+        ghost_0.draw(window)
+        ghost_1.draw(window)
+        ghost_2.draw(window)
+        ghost_3.draw(window)
 
         # draw the point counter
         text_surface = font.render(f'Point left: {load_level.point}', True, (255, 255, 255))

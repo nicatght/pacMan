@@ -98,3 +98,24 @@ class pac_man:
                         if not exist_collision(self.position[0], self.position[1] + 1):
                             self.direction = "d"
                             self.cache_direction = ""
+class ghost:
+    def __init__(self, id):
+        match id:
+            case 0:
+                img = pygame.image.load("./pic/ghost_1.png")
+                self.position = [7, 9]
+            case 1:
+                img = pygame.image.load("./pic/ghost_2.png")
+                self.position = [8, 9]
+            case 2:
+                img = pygame.image.load("./pic/ghost_3.png")
+                self.position = [10, 9]
+            case 3:
+                img = pygame.image.load("./pic/ghost_4.png")
+                self.position = [11, 9]
+
+        self.img = pygame.transform.scale(img, (20, 20))
+        self.r_position = [(self.position[0] + margin_x) * 20, (self.position[1] + margin_y) * 20]
+
+    def draw(self, window):
+        window.blit(self.img, (self.r_position[0], self.r_position[1]))
