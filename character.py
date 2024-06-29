@@ -14,7 +14,7 @@ def exist_collision(x, y) -> bool:
     :param y: grid position y
     :return: True if there is a wall, false otherwise
     """
-    return lv.level_array[y * lv.columns + x] == 1
+    return lv.level_array[y * lv.columns + x] == 1 or lv.level_array[y * lv.columns + x] == 5
 
 
 def update_position(position, r_position) -> None:
@@ -36,7 +36,7 @@ class pac_man:
         self.character = pygame.image.load("./pic/man.png")
         self.character = pygame.transform.scale(self.character, (20, 20))
         self.cache_direction = ''
-        self.direction = "l"
+        self.direction = "r"
 
         self.position = [9, 15]
         self.r_position = [(self.position[0] + margin_x) * 20, (self.position[1] + margin_y) * 20]
@@ -74,6 +74,12 @@ class pac_man:
 
         if self.r_position[0] % 20 == 0 and self.r_position[1] % 20 == 0:
             update_position(self.position, self.r_position)
+            if lv.level_array[self.position[1] * lv.columns + self.position[0]] == 0:
+                lv.level_array[self.position[1] * lv.columns + self.position[0]] = 2
+                lv.point -= 1
+                if lv.point == 190:
+                    game_play_status = "win"
+
             if self.cache_direction != "":
                 match self.cache_direction:
                     case "r":

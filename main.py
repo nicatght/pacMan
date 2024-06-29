@@ -1,6 +1,7 @@
 margin_x = 10
 margin_y = 4
 
+
 n_level = 1
 
 
@@ -14,6 +15,7 @@ def main():
     from sys import exit
     from character import pac_man
 
+    game_play_status = True
     pygame.init()
     screen = pygame.display.set_mode((960, 540))
 
@@ -21,19 +23,23 @@ def main():
     clock = pygame.time.Clock()
     pygame.display.set_caption("PacMan")
 
+    font = pygame.font.SysFont('Arial', 24)
+
     # load character
     main_c = pac_man()
+
+    # load point picture
+    point_pic = pygame.image.load("./pic/point.png")
 
     def draw_rec(window, x, y, color_index):
         if color_index == 1:
             pygame.draw.rect(window, (0, 100, 255), pygame.Rect(20 * x, 20 * y, 20, 20))
+        elif color_index == 0:
+            window.blit(point_pic, (20 * x + margin_x - 10, 20 * y + margin_y - 5))
 
     # loop that update the screen
     def redraw(window):
         window.fill((0, 0, 0))
-
-        if load_level.level_array is None:
-            load_level.load_level(1)
 
         rows = load_level.rows
         columns = load_level.columns
@@ -47,13 +53,33 @@ def main():
         main_c.draw(window)
         main_c.update_location(load_level.level_array)
 
+        # draw the point counter
+        text_surface = font.render(f'Point left: {load_level.point}', True, (255, 255, 255))
+        text_rect = text_surface.get_rect()
+        text_rect.center = (750, 250)
+        screen.blit(text_surface, text_rect)
+
+    def print_win_page(window):
+        window.fill((0, 0, 0))
+
+        text_surface = font.render('Win!', True, (255, 255, 255))
+        text_rect = text_surface.get_rect()
+        text_rect.center = (480, 250)
+        screen.blit(text_surface, text_rect)
+
     while True:
         # get event
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit(0)
-        redraw(screen)
+        if load_level.level_array is None:
+            load_level.load_level(1)
+
+        if load_level.point > 0:
+            redraw(screen)
+        else:
+            print_win_page(screen)
 
         pygame.display.update()
         clock.tick(FPS)
