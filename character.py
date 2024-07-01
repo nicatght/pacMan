@@ -4,10 +4,11 @@ import load_level as lv
 
 import keyboard
 from keyBoard import on_key_press
+import random
 
 
 # return true if collision happen, false otherwise
-def exist_collision(x, y, neglect_gate = False) -> bool:
+def exist_collision(x, y, neglect_gate=False) -> bool:
     """
     Check if there is a wall in grid location (x, y)
     :param neglect_gate: decide whether to neglect gate or not (ghost purpose)
@@ -20,14 +21,14 @@ def exist_collision(x, y, neglect_gate = False) -> bool:
     return lv.level_array[y * lv.columns + x] == 1 or lv.level_array[y * lv.columns + x] == 5
 
 
-def update_r_position(direction: str, position, r_position, *, neglect_gate=False):
+def update_r_position(direction: str, position, r_position, *, neglect_gate=False) -> tuple:
     """
     This function is used to update element's real position base on its direction and location
     :param direction:
     :param position: the grid position
     :param r_position: the real position print in window
     :param neglect_gate: whether the movement neglect gate or not
-    :return:
+    :return: the new r_position
     """
     match direction:
         case "r":
@@ -42,6 +43,8 @@ def update_r_position(direction: str, position, r_position, *, neglect_gate=Fals
         case "d":
             if not exist_collision(position[0], position[1] + 1, neglect_gate):
                 r_position = (r_position[0], r_position[1] + 1)
+    if r_position[0] % 20 == 0 and r_position[1] % 20 == 0:
+        update_position(position, r_position)
     return r_position
 
 
@@ -87,13 +90,11 @@ class pac_man:
     def update_location(self):
         self.r_position = update_r_position(self.direction, self.position, self.r_position)
 
+        # managing changing direction when character is in decision spot
         if self.r_position[0] % 20 == 0 and self.r_position[1] % 20 == 0:
-            update_position(self.position, self.r_position)
             if lv.level_array[self.position[1] * lv.columns + self.position[0]] == 0:
                 lv.level_array[self.position[1] * lv.columns + self.position[0]] = 2
                 lv.point -= 1
-                if lv.point == 190:
-                    game_play_status = "win"
 
             if self.cache_direction != "":
                 match self.cache_direction:
@@ -117,20 +118,24 @@ class pac_man:
 
 class ghost:
     def __init__(self, id):
-        is_release = False
+        self.is_release = 0  # 0: not release, 1: released, 2 releasing
         match id:
             case 0:
                 img = pygame.image.load("./pic/ghost_1.png")
                 self.position = [7, 9]
+                self.direction = "r"
             case 1:
                 img = pygame.image.load("./pic/ghost_2.png")
                 self.position = [8, 9]
+                self.direction = "r"
             case 2:
                 img = pygame.image.load("./pic/ghost_3.png")
                 self.position = [10, 9]
+                self.direction = "l"
             case 3:
                 img = pygame.image.load("./pic/ghost_4.png")
                 self.position = [11, 9]
+                self.direction = "l"
 
         self.img = pygame.transform.scale(img, (20, 20))
         self.r_position = [(self.position[0] + margin_x) * 20, (self.position[1] + margin_y) * 20]
@@ -138,5 +143,18 @@ class ghost:
     def draw(self, window):
         window.blit(self.img, (self.r_position[0], self.r_position[1]))
 
-    def release(self):
+    def update_location(self) -> None:
+        if self.is_release == 0:  # not release
+            return
+        elif self.is_release == 1:  # released
+            return
+        else:  # releasing
+            self.r_position = update_r_position(self.direction, self.position, self.r_position, neglect_gate=True)
+            if self.position == [9, 9]:
+                self.direction = "d"
+            elif self.position == [9, 11]:
+                self.is_release = 1
+
+    def release(self) -> None:
         print("releasing")
+        self.is_release = 2

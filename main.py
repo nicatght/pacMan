@@ -70,6 +70,11 @@ def main():
         ghost_2.draw(window)
         ghost_3.draw(window)
 
+        ghost_0.update_location()
+        ghost_1.update_location()
+        ghost_2.update_location()
+        ghost_3.update_location()
+
         # draw the point counter
         text_surface = font.render(f'Point left: {load_level.point}', True, (255, 255, 255))
         text_rect = text_surface.get_rect()
