@@ -7,14 +7,42 @@ from keyBoard import on_key_press
 
 
 # return true if collision happen, false otherwise
-def exist_collision(x, y) -> bool:
+def exist_collision(x, y, neglect_gate = False) -> bool:
     """
     Check if there is a wall in grid location (x, y)
+    :param neglect_gate: decide whether to neglect gate or not (ghost purpose)
     :param x: grid position x
     :param y: grid position y
     :return: True if there is a wall, false otherwise
     """
+    if neglect_gate:
+        return lv.level_array[y * lv.columns + x] == 1
     return lv.level_array[y * lv.columns + x] == 1 or lv.level_array[y * lv.columns + x] == 5
+
+
+def update_r_position(direction: str, position, r_position, *, neglect_gate=False):
+    """
+    This function is used to update element's real position base on its direction and location
+    :param direction:
+    :param position: the grid position
+    :param r_position: the real position print in window
+    :param neglect_gate: whether the movement neglect gate or not
+    :return:
+    """
+    match direction:
+        case "r":
+            if not exist_collision(position[0] + 1, position[1], neglect_gate):
+                r_position = (r_position[0] + 1, r_position[1])
+        case "l":
+            if not exist_collision(position[0] - 1, position[1], neglect_gate):
+                r_position = (r_position[0] - 1, r_position[1])
+        case "u":
+            if not exist_collision(position[0], position[1] - 1, neglect_gate):
+                r_position = (r_position[0], r_position[1] - 1)
+        case "d":
+            if not exist_collision(position[0], position[1] + 1, neglect_gate):
+                r_position = (r_position[0], r_position[1] + 1)
+    return r_position
 
 
 def update_position(position, r_position) -> None:
@@ -56,21 +84,8 @@ class pac_man:
 
         window.blit(img, (self.r_position[0], self.r_position[1]))
 
-    def update_location(self, level_array: list):
-
-        match self.direction:
-            case "r":
-                if not exist_collision(self.position[0] + 1, self.position[1]):
-                    self.r_position = (self.r_position[0] + 1, self.r_position[1])
-            case "l":
-                if not exist_collision(self.position[0] - 1, self.position[1]):
-                    self.r_position = (self.r_position[0] - 1, self.r_position[1])
-            case "u":
-                if not exist_collision(self.position[0], self.position[1] - 1):
-                    self.r_position = (self.r_position[0], self.r_position[1] - 1)
-            case "d":
-                if not exist_collision(self.position[0], self.position[1] + 1):
-                    self.r_position = (self.r_position[0], self.r_position[1] + 1)
+    def update_location(self):
+        self.r_position = update_r_position(self.direction, self.position, self.r_position)
 
         if self.r_position[0] % 20 == 0 and self.r_position[1] % 20 == 0:
             update_position(self.position, self.r_position)
@@ -98,8 +113,11 @@ class pac_man:
                         if not exist_collision(self.position[0], self.position[1] + 1):
                             self.direction = "d"
                             self.cache_direction = ""
+
+
 class ghost:
     def __init__(self, id):
+        is_release = False
         match id:
             case 0:
                 img = pygame.image.load("./pic/ghost_1.png")
@@ -119,3 +137,6 @@ class ghost:
 
     def draw(self, window):
         window.blit(self.img, (self.r_position[0], self.r_position[1]))
+
+    def release(self):
+        print("releasing")

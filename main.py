@@ -34,12 +34,20 @@ def main():
 
     # load point picture
     point_pic = pygame.image.load("./pic/point.png")
+    gate_pic = pygame.image.load("./pic/gate.png")
+
+    # load element appear event
+    RELEASE_GHOST_EVENT = pygame.USEREVENT + 1
+    ghost_is_release = False
+    pygame.time.set_timer(RELEASE_GHOST_EVENT, 1500)
 
     def draw_rec(window, x, y, color_index):
         if color_index == 1:
             pygame.draw.rect(window, (0, 100, 255), pygame.Rect(20 * x, 20 * y, 20, 20))
         elif color_index == 0:
             window.blit(point_pic, (20 * x + margin_x - 10, 20 * y + margin_y - 5))
+        elif color_index == 5:
+            window.blit(gate_pic, (20 * x + margin_x - 10, 20 * y + margin_y - 5))
 
     # loop that update the screen
     def redraw(window):
@@ -55,7 +63,7 @@ def main():
 
         # draw character
         main_c.draw(window)
-        main_c.update_location(load_level.level_array)
+        main_c.update_location()
 
         ghost_0.draw(window)
         ghost_1.draw(window)
@@ -82,6 +90,13 @@ def main():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit(0)
+            if event.type == RELEASE_GHOST_EVENT and not ghost_is_release:
+                ghost_is_release = True
+                ghost_0.release()
+                ghost_1.release()
+                ghost_2.release()
+                ghost_3.release()
+
         if load_level.level_array is None:
             load_level.load_level(1)
 
