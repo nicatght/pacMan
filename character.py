@@ -147,7 +147,9 @@ class ghost:
         if self.is_release == 0:  # not release
             return
         elif self.is_release == 1:  # released
-            return
+            self.r_position = update_r_position(self.direction, self.position, self.r_position)
+            if self.r_position[0] % 20 == 0 and self.r_position[1] % 20 == 0:
+                self.direction = self.direction_decider(self.direction, self.position)
         else:  # releasing
             self.r_position = update_r_position(self.direction, self.position, self.r_position, neglect_gate=True)
             if self.position == [9, 9]:
@@ -155,6 +157,38 @@ class ghost:
             elif self.position == [9, 11]:
                 self.is_release = 1
 
+    @staticmethod
+    def direction_decider(direction, position) -> str:
+        """
+
+        :param direction: the direction currently the element is heading to
+        :param position: the current grid position
+        :return: new direction
+        """
+        directions = {"u", "d", "l", "r"}
+        available_dir = set()
+
+        # remove the opposite side
+        opposites = {"u": "d", "d": "u", "l": "r", "r": "l"}
+        directions.remove(opposites[direction])
+
+        # remove direction that is not available
+        for d in directions:
+            match d:
+                case "u":
+                    if not exist_collision(position[0], position[1] - 1):
+                        available_dir.add("u")
+                case "d":
+                    if not exist_collision(position[0], position[1] + 1):
+                        available_dir.add("d")
+                case "l":
+                    if not exist_collision(position[0] - 1, position[1]):
+                        available_dir.add("l")
+                case "r":
+                    if not exist_collision(position[0] + 1, position[1]):
+                        available_dir.add("r")
+
+        return random.choice(list(available_dir))
+
     def release(self) -> None:
-        print("releasing")
         self.is_release = 2
