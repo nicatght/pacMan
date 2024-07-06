@@ -15,9 +15,10 @@ def main():
     from sys import exit
     from character import pac_man, ghost
 
-    game_play_status = False
     pygame.init()
     screen = pygame.display.set_mode((960, 540))
+
+    fail = False
 
     FPS = 60
     clock = pygame.time.Clock()
@@ -31,6 +32,10 @@ def main():
     ghost_1 = ghost(1)
     ghost_2 = ghost(2)
     ghost_3 = ghost(3)
+
+    def init_character():
+        nonlocal main_c
+        main_c = pac_man()
 
     # load point picture
     point_pic = pygame.image.load("./pic/point.png")
@@ -51,6 +56,8 @@ def main():
 
     # loop that update the screen
     def redraw(window):
+        nonlocal fail
+
         window.fill((0, 0, 0))
 
         rows = load_level.rows
@@ -63,17 +70,24 @@ def main():
 
         # draw character
         main_c.draw(window)
-        main_c.update_location()
-
         ghost_0.draw(window)
         ghost_1.draw(window)
         ghost_2.draw(window)
         ghost_3.draw(window)
 
-        ghost_0.update_location()
-        ghost_1.update_location()
-        ghost_2.update_location()
-        ghost_3.update_location()
+        if not fail:
+            main_c.update_location()
+            ghost_0.update_location()
+            ghost_1.update_location()
+            ghost_2.update_location()
+            ghost_3.update_location()
+        else:
+            init_character()
+            load_level.load_level(1)
+            fail = False
+
+        if ghost_0.check_eaten(main_c) or ghost_1.check_eaten(main_c) or ghost_2.check_eaten(main_c) or ghost_3.check_eaten(main_c):
+            fail = True
 
         # draw the point counter
         text_surface = font.render(f'Point left: {load_level.point}', True, (255, 255, 255))

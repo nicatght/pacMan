@@ -190,5 +190,8 @@ class ghost:
 
         return random.choice(list(available_dir))
 
+    def check_eaten(self, main: pac_man):
+        return abs(main.r_position[0] - self.r_position[0]) < 19 and abs(main.r_position[1] - self.r_position[1]) < 19
+
     def release(self) -> None:
         self.is_release = 2
